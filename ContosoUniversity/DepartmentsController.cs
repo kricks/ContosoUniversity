@@ -27,23 +27,27 @@ namespace ContosoUniversity
         }
 
         // GET: Departments/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+public async Task<IActionResult> Details(int? id)
+{
+    if (id == null)
+    {
+        return NotFound();
+    }
 
-            var department = await _context.Departments
-                .Include(d => d.Administrator)
-                .SingleOrDefaultAsync(m => m.DepartmentID == id);
-            if (department == null)
-            {
-                return NotFound();
-            }
+    string query = "SELECT * FROM Department WHERE DepartmentID = {0}";
+    var department = await _context.Departments
+        .FromSql(query, id)
+        .Include(d => d.Administrator)
+        .AsNoTracking()
+        .SingleOrDefaultAsync();
 
-            return View(department);
-        }
+    if (department == null)
+    {
+        return NotFound();
+    }
+
+    return View(department);
+}
 
         // GET: Departments/Create
         public IActionResult Create()
